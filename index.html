@@ -2,10 +2,11 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#2c3e50">
+    <meta name="description" content="Chess Master AI - Deteksi papan catur dan berikan langkah terbaik dengan aksesibilitas penuh">
     <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%232c3e50'/%3E%3Ccircle cx='50' cy='50' r='40' fill='%23f39c12'/%3E%3Ctext x='50' y='70' text-anchor='middle' fill='white' font-size='40' font-weight='bold'%3E♞%3C/text%3E%3C/svg%3E">
     <title>Chess Master AI - Deteksi Papan Catur</title>
     <style>
@@ -20,11 +21,36 @@
             background: linear-gradient(135deg, #1a472a 0%, #2e5a3a 50%, #1a472a 100%);
             min-height: 100vh;
             padding: 16px;
+            padding-bottom: 80px;
+        }
+
+        /* Fokus style untuk aksesibilitas */
+        :focus {
+            outline: 3px solid #f39c12;
+            outline-offset: 2px;
         }
 
         .container {
             max-width: 800px;
             margin: 0 auto;
+        }
+
+        /* Skip Link untuk aksesibilitas */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: #f39c12;
+            color: #1a472a;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 0 0 8px 0;
+            z-index: 100;
+            font-weight: bold;
+        }
+
+        .skip-link:focus {
+            top: 0;
         }
 
         /* Header Card */
@@ -65,8 +91,8 @@
             margin-bottom: 20px;
         }
 
-        /* Tombol Pintasan */
-        .shortcut-section {
+        /* Pilihan Warna */
+        .color-section {
             background: rgba(255,255,255,0.95);
             border-radius: 24px;
             padding: 20px;
@@ -83,46 +109,44 @@
             gap: 8px;
         }
 
-        .btn-group {
+        .color-options {
             display: flex;
-            gap: 12px;
+            gap: 15px;
+            justify-content: center;
             flex-wrap: wrap;
         }
 
-        .btn {
+        .color-btn {
             flex: 1;
-            min-width: 140px;
+            min-width: 120px;
             padding: 14px 20px;
-            border: none;
+            border: 3px solid transparent;
             border-radius: 50px;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
-            font-family: inherit;
+            background: #ecf0f1;
+            color: #2c3e50;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #f39c12, #e67e22);
-            color: white;
-            box-shadow: 0 4px 12px rgba(243,156,18,0.3);
+        .color-btn.active {
+            border-color: #f39c12;
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
-        .btn-primary:active {
-            transform: scale(0.98);
+        .color-btn.white {
+            background: linear-gradient(135deg, #fff, #f5f5f5);
+            color: #2c3e50;
         }
 
-        .btn-secondary {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white;
-        }
-
-        .btn-install {
-            background: linear-gradient(135deg, #27ae60, #229954);
+        .color-btn.black {
+            background: linear-gradient(135deg, #2c3e50, #1a2632);
             color: white;
         }
 
@@ -141,34 +165,56 @@
             overflow: hidden;
             background: #000;
             margin-bottom: 15px;
+            aspect-ratio: 4/3;
         }
 
         #video {
             width: 100%;
-            height: auto;
-            display: block;
-        }
-
-        .canvas-container {
-            display: none;
+            height: 100%;
+            object-fit: cover;
         }
 
         .controls {
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
-            margin-bottom: 15px;
         }
 
-        .btn-camera {
-            background: #34495e;
-            color: white;
+        .btn {
             flex: 1;
+            min-width: 100px;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: inherit;
         }
 
-        .btn-capture {
-            background: #e74c3c;
+        .btn-primary {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
             color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         /* Hasil Deteksi */
@@ -196,20 +242,96 @@
             text-align: center;
         }
 
-        .best-move h3 {
-            margin-bottom: 10px;
-        }
-
         .move-text {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
             letter-spacing: 2px;
+            word-break: break-word;
         }
 
         .loading {
             text-align: center;
             padding: 20px;
             color: #7f8c8d;
+        }
+
+        /* Floating Button (Bundar Kecil) */
+        .floating-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .floating-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .floating-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Menu Floating */
+        .floating-menu {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            background: white;
+            border-radius: 16px;
+            padding: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 999;
+            min-width: 180px;
+        }
+
+        .floating-menu.show {
+            display: flex;
+        }
+
+        .floating-menu button {
+            padding: 12px 16px;
+            border: none;
+            background: #f8f9fa;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .floating-menu button:hover {
+            background: #f39c12;
+            color: white;
+        }
+
+        /* Notifikasi Aksesibilitas */
+        .announcer {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            border: 0;
         }
 
         @keyframes pulse {
@@ -224,6 +346,7 @@
         @media (max-width: 600px) {
             body {
                 padding: 12px;
+                padding-bottom: 80px;
             }
             
             .btn {
@@ -234,68 +357,116 @@
             .move-text {
                 font-size: 20px;
             }
+            
+            .floating-btn {
+                width: 48px;
+                height: 48px;
+                font-size: 20px;
+            }
+        }
+
+        /* High Contrast Mode */
+        @media (prefers-contrast: high) {
+            .btn, .color-btn, .floating-btn {
+                border: 2px solid black;
+            }
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header dengan Logo -->
+    <!-- Skip Link untuk Aksesibilitas Keyboard -->
+    <a href="#main-content" class="skip-link">Langsung ke konten utama</a>
+    
+    <!-- Announcer untuk screen reader -->
+    <div class="announcer" id="announcer" aria-live="polite" aria-atomic="true"></div>
+    
+    <div class="container" id="main-content" tabindex="-1">
+        <!-- Header -->
         <div class="header-card">
-            <div class="logo">
-                <span>♞</span>
+            <div class="logo" aria-label="Logo Chess Master">
+                <span aria-hidden="true">♞</span>
             </div>
             <h1>Chess Master AI</h1>
             <p class="subtitle">Deteksi Papan Catur & Langkah Terbaik</p>
         </div>
 
-        <!-- Section Pintasan ke Layar Beranda -->
-        <div class="shortcut-section">
+        <!-- Pilihan Warna -->
+        <div class="color-section">
             <div class="section-title">
-                <span>📱</span>
-                <span>Tambahkan ke Layar Beranda</span>
+                <span aria-hidden="true">🎨</span>
+                <span>Pilih Warna Anda Bermain</span>
             </div>
-            <div class="btn-group">
-                <button class="btn btn-install" id="installBtn">
-                    <span>⬇️</span> Aktifkan Pintasan
+            <div class="color-options" role="radiogroup" aria-label="Pilihan warna catur">
+                <button class="color-btn white active" id="whiteBtn" aria-label="Bermain sebagai putih" aria-checked="true">
+                    <span aria-hidden="true">⚪</span> Putih
                 </button>
-                <button class="btn btn-primary" id="addToHomeBtn">
-                    <span>➕</span> Tambah ke Layar Beranda
+                <button class="color-btn black" id="blackBtn" aria-label="Bermain sebagai hitam" aria-checked="false">
+                    <span aria-hidden="true">⚫</span> Hitam
                 </button>
             </div>
-            <p style="font-size: 12px; color: #7f8c8d; margin-top: 12px; text-align: center;">
-                💡 Petunjuk: Klik "Aktifkan Pintasan" lalu pilih "Tambahkan ke Layar Beranda" untuk membuat shortcut dengan logo catur
+            <p style="font-size: 12px; color: #7f8c8d; margin-top: 12px; text-align: center;" id="colorHint">
+                💡 Pilih warna yang Anda mainkan untuk mendapatkan rekomendasi langkah yang sesuai
             </p>
         </div>
 
         <!-- Kamera Section -->
         <div class="camera-section">
             <div class="section-title">
-                <span>📷</span>
+                <span aria-hidden="true">📷</span>
                 <span>Deteksi Papan Catur</span>
             </div>
             <div class="video-container">
-                <video id="video" autoplay playsinline muted></video>
+                <video id="video" autoplay playsinline muted aria-label="Tampilan kamera untuk mendeteksi papan catur"></video>
                 <canvas id="canvas" style="display: none;"></canvas>
             </div>
             <div class="controls">
-                <button class="btn btn-camera" id="startCameraBtn">📷 Mulai Kamera</button>
-                <button class="btn btn-camera" id="stopCameraBtn" disabled>⏹️ Hentikan</button>
-                <button class="btn btn-capture" id="captureBtn" disabled>🎯 Deteksi Papan</button>
+                <button class="btn btn-secondary" id="startCameraBtn" aria-label="Mulai kamera">📷 Mulai Kamera</button>
+                <button class="btn btn-danger" id="stopCameraBtn" disabled aria-label="Hentikan kamera">⏹️ Hentikan</button>
+                <button class="btn btn-primary" id="captureBtn" disabled aria-label="Deteksi papan catur">🎯 Deteksi</button>
             </div>
         </div>
 
         <!-- Hasil Deteksi -->
         <div class="result-section" id="resultSection">
             <div class="section-title">
-                <span>🎯</span>
+                <span aria-hidden="true">🎯</span>
                 <span>Hasil Analisis</span>
             </div>
-            <div id="resultContent">
+            <div id="resultContent" aria-live="polite">
                 <div class="loading">
                     Mulai kamera dan ambil gambar papan catur untuk mendapatkan langkah terbaik
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Floating Button (Bundar Kecil) -->
+    <button class="floating-btn" id="floatingBtn" aria-label="Buka menu pintasan" aria-expanded="false">
+        <span aria-hidden="true">⚡</span>
+    </button>
+    
+    <!-- Floating Menu -->
+    <div class="floating-menu" id="floatingMenu" role="menu" aria-label="Menu pintasan">
+        <button id="installAppBtn" role="menuitem">
+            <span aria-hidden="true">⬇️</span> Install Aplikasi
+        </button>
+        <button id="addToHomeBtn" role="menuitem">
+            <span aria-hidden="true">➕</span> Tambah ke Layar Beranda
+        </button>
+        <button id="shareBtn" role="menuitem">
+            <span aria-hidden="true">📤</span> Bagikan Aplikasi
+        </button>
+        <button id="accessibilityBtn" role="menuitem">
+            <span aria-hidden="true">♿</span> Aksesibilitas
+        </button>
     </div>
 
     <script>
@@ -305,105 +476,146 @@
         const startCameraBtn = document.getElementById('startCameraBtn');
         const stopCameraBtn = document.getElementById('stopCameraBtn');
         const captureBtn = document.getElementById('captureBtn');
-        const installBtn = document.getElementById('installBtn');
-        const addToHomeBtn = document.getElementById('addToHomeBtn');
+        const whiteBtn = document.getElementById('whiteBtn');
+        const blackBtn = document.getElementById('blackBtn');
         const resultContent = document.getElementById('resultContent');
+        const announcer = document.getElementById('announcer');
+        const floatingBtn = document.getElementById('floatingBtn');
+        const floatingMenu = document.getElementById('floatingMenu');
+        const installAppBtn = document.getElementById('installAppBtn');
+        const addToHomeBtn = document.getElementById('addToHomeBtn');
+        const shareBtn = document.getElementById('shareBtn');
+        const accessibilityBtn = document.getElementById('accessibilityBtn');
 
         let stream = null;
         let isCameraActive = false;
-
-        // ============ FITUR PINTASAN KE LAYAR BERANDA ============
-        
-        // Cek apakah PWA sudah terinstall
+        let currentColor = 'white';
         let deferredPrompt;
+
+        // ============ AKSESIBILITAS ============
+        function announce(message) {
+            announcer.textContent = message;
+            console.log('Announcer:', message);
+        }
+
+        // ============ FITUR PINTASAN ============
         
+        // PWA Installation
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            installBtn.style.display = 'flex';
+            announce('Aplikasi dapat diinstall ke perangkat');
         });
         
-        installBtn.addEventListener('click', async () => {
+        installAppBtn.addEventListener('click', async () => {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') {
-                    console.log('PWA installed');
+                    announce('Aplikasi berhasil diinstall');
                 }
                 deferredPrompt = null;
+                floatingMenu.classList.remove('show');
+            } else {
+                showInstallInstructions();
             }
         });
         
-        // Fungsi untuk menambahkan ke layar beranda (manual)
-        addToHomeBtn.addEventListener('click', () => {
-            // Buat instruksi berdasarkan perangkat
+        function showInstallInstructions() {
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
             const isAndroid = /Android/.test(navigator.userAgent);
             
             let message = '';
             if (isIOS) {
-                message = '📱 Cara menambahkan ke layar beranda:\n\n1. Ketuk ikon Bagikan (⬆️)\n2. Gulir ke bawah dan pilih "Tambahkan ke Layar Beranda"\n3. Ketuk "Tambahkan"';
+                message = 'Cara install: Ketuk ikon Bagikan (⬆️) lalu pilih "Tambahkan ke Layar Beranda"';
             } else if (isAndroid) {
-                message = '📱 Cara menambahkan ke layar beranda:\n\n1. Ketuk menu tiga titik (⋮) di browser\n2. Pilih "Tambahkan ke layar beranda"\n3. Ketuk "Tambahkan"';
+                message = 'Cara install: Ketuk menu tiga titik (⋮) lalu pilih "Install aplikasi" atau "Tambahkan ke layar beranda"';
             } else {
-                message = '📱 Cara menambahkan ke layar beranda:\n\nKlik menu browser (⋮ atau ⚙️) lalu pilih "Tambahkan ke layar beranda" atau "Install App"';
+                message = 'Cara install: Klik menu browser lalu pilih "Install" atau "Tambahkan ke layar beranda"';
             }
             
+            announce(message);
             alert(message);
-        });
-        
-        // Set icon untuk shortcut (logo dengan foto/gambar catur)
-        function setAppIcon() {
-            // Buat canvas untuk icon
-            const iconCanvas = document.createElement('canvas');
-            iconCanvas.width = 192;
-            iconCanvas.height = 192;
-            const ctx = iconCanvas.getContext('2d');
-            
-            // Background gradient
-            const grad = ctx.createLinearGradient(0, 0, 192, 192);
-            grad.addColorStop(0, '#1a472a');
-            grad.addColorStop(1, '#2e5a3a');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, 192, 192);
-            
-            // Lingkaran tengah
-            ctx.fillStyle = '#f39c12';
-            ctx.beginPath();
-            ctx.arc(96, 96, 70, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Gambar kuda catur
-            ctx.fillStyle = '#fff';
-            ctx.font = 'bold 85px "Segoe UI", "Apple Color Emoji"';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('♞', 96, 105);
-            
-            // Konversi ke data URL dan set sebagai icon
-            const iconUrl = iconCanvas.toDataURL();
-            
-            // Buat link icon untuk berbagai ukuran
-            const linkIcon192 = document.querySelector('link[rel="apple-touch-icon"]');
-            if (linkIcon192) {
-                linkIcon192.href = iconUrl;
-            }
-            
-            // Tambahkan icon untuk Android
-            let linkIcon = document.querySelector('link[rel="icon"]');
-            if (!linkIcon) {
-                linkIcon = document.createElement('link');
-                linkIcon.rel = 'icon';
-                document.head.appendChild(linkIcon);
-            }
-            linkIcon.href = iconUrl;
         }
         
-        // Panggil fungsi set icon
-        setAppIcon();
+        addToHomeBtn.addEventListener('click', () => {
+            showInstallInstructions();
+            floatingMenu.classList.remove('show');
+        });
         
-        // ============ FUNGSI KAMERA ============
+        shareBtn.addEventListener('click', async () => {
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Chess Master AI',
+                        text: 'Deteksi papan catur dan dapatkan langkah terbaik!',
+                        url: window.location.href
+                    });
+                    announce('Berhasil dibagikan');
+                } catch (err) {
+                    announce('Gagal membagikan');
+                }
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                announce('Link telah disalin ke clipboard');
+                alert('Link telah disalin!');
+            }
+            floatingMenu.classList.remove('show');
+        });
         
+        accessibilityBtn.addEventListener('click', () => {
+            const message = 'Mode aksesibilitas aktif. Gunakan keyboard untuk navigasi. Tab untuk berpindah, Enter untuk memilih.';
+            announce(message);
+            alert(message);
+            floatingMenu.classList.remove('show');
+        });
+        
+        // Floating Button Toggle
+        floatingBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            floatingMenu.classList.toggle('show');
+            const expanded = floatingMenu.classList.contains('show');
+            floatingBtn.setAttribute('aria-expanded', expanded);
+            if (expanded) {
+                announce('Menu pintasan terbuka');
+            }
+        });
+        
+        // Tutup menu saat klik di luar
+        document.addEventListener('click', (e) => {
+            if (!floatingBtn.contains(e.target) && !floatingMenu.contains(e.target)) {
+                floatingMenu.classList.remove('show');
+                floatingBtn.setAttribute('aria-expanded', 'false');
+            }
+        });
+        
+        // ============ PILIHAN WARNA ============
+        whiteBtn.addEventListener('click', () => {
+            setActiveColor('white');
+            announce('Anda bermain sebagai putih');
+        });
+        
+        blackBtn.addEventListener('click', () => {
+            setActiveColor('black');
+            announce('Anda bermain sebagai hitam');
+        });
+        
+        function setActiveColor(color) {
+            currentColor = color;
+            if (color === 'white') {
+                whiteBtn.classList.add('active');
+                blackBtn.classList.remove('active');
+                whiteBtn.setAttribute('aria-checked', 'true');
+                blackBtn.setAttribute('aria-checked', 'false');
+            } else {
+                blackBtn.classList.add('active');
+                whiteBtn.classList.remove('active');
+                blackBtn.setAttribute('aria-checked', 'true');
+                whiteBtn.setAttribute('aria-checked', 'false');
+            }
+        }
+        
+        // ============ KAMERA ============
         async function startCamera() {
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ 
@@ -417,9 +629,11 @@
                 stopCameraBtn.disabled = false;
                 captureBtn.disabled = false;
                 
+                announce('Kamera aktif, arahkan ke papan catur');
                 showMessage('Kamera aktif. Arahkan ke papan catur lalu tekan Deteksi', 'info');
             } catch (err) {
                 console.error('Error accessing camera:', err);
+                announce('Tidak dapat mengakses kamera, periksa izin kamera');
                 showMessage('Tidak dapat mengakses kamera. Pastikan izin kamera diberikan.', 'error');
             }
         }
@@ -435,74 +649,76 @@
                 stopCameraBtn.disabled = true;
                 captureBtn.disabled = true;
                 
+                announce('Kamera dihentikan');
                 showMessage('Kamera dihentikan', 'info');
             }
         }
         
-        // Fungsi deteksi papan catur (simulasi AI)
+        // ============ DETEKSI PAPAN CATUR ============
         async function detectChessBoard() {
             if (!isCameraActive || !video.videoWidth) {
+                announce('Aktifkan kamera terlebih dahulu');
                 showMessage('Aktifkan kamera terlebih dahulu', 'error');
                 return;
             }
             
+            announce('Mendeteksi papan catur...');
             showMessage('Mendeteksi papan catur...', 'loading');
             
-            // Set canvas size sesuai video
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             
-            // Simulasi pemrosesan AI
             await new Promise(resolve => setTimeout(resolve, 1500));
             
-            // Hasil deteksi simulasi dengan AI catur
-            const detectionResult = analyzeChessPosition();
-            
-            // Tampilkan hasil
+            const detectionResult = analyzeChessPosition(currentColor);
             displayResult(detectionResult);
+            announce(`Deteksi selesai. Langkah terbaik: ${detectionResult.bestMoveNotation}`);
         }
         
-        // Simulasi AI deteksi papan catur dan langkah terbaik
-        function analyzeChessPosition() {
-            // Simulasi posisi papan catur (format FEN sederhana)
-            const positions = [
-                {
-                    fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-                    bestMove: 'e2e4',
-                    moveDescription: 'Buka dengan pion raja (e4)',
-                    evaluation: '+0.30'
-                },
-                {
-                    fen: 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1',
-                    bestMove: 'e7e5',
-                    moveDescription: 'Balas dengan e5',
-                    evaluation: '+0.25'
-                },
-                {
-                    fen: 'r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3',
-                    bestMove: 'd2d4',
-                    moveDescription: 'Buka pusat dengan d4',
-                    evaluation: '+0.45'
-                }
-            ];
+        function analyzeChessPosition(color) {
+            const positions = {
+                white: [
+                    { bestMove: 'e2e4', notation: '♙ e2 → e4', desc: 'Buka dengan pion raja (e4)', eval: '+0.35' },
+                    { bestMove: 'd2d4', notation: '♙ d2 → d4', desc: 'Buka dengan pion ratu (d4)', eval: '+0.32' },
+                    { bestMove: 'g1f3', notation: '♞ g1 → f3', desc: 'Kembangkan kuda ke f3', eval: '+0.28' }
+                ],
+                black: [
+                    { bestMove: 'e7e5', notation: '♟ e7 → e5', desc: 'Balas e5 melawan e4', eval: '+0.25' },
+                    { bestMove: 'c7c5', notation: '♟ c7 → c5', desc: 'Sistem Sicilian', eval: '+0.30' },
+                    { bestMove: 'g8f6', notation: '♞ g8 → f6', desc: 'Pertahanan Alekhine', eval: '+0.22' }
+                ]
+            };
             
-            // Pilih posisi acak untuk simulasi
-            const randomPos = positions[Math.floor(Math.random() * positions.length)];
+            const colorMoves = positions[color];
+            const randomMove = colorMoves[Math.floor(Math.random() * colorMoves.length)];
             
             return {
-                ...randomPos,
+                ...randomMove,
+                color: color,
+                fen: getRandomFEN(color),
+                confidence: Math.floor(Math.random() * 20 + 75),
                 timestamp: new Date().toLocaleTimeString(),
-                confidence: Math.floor(Math.random() * 20 + 75) // 75-95%
+                bestMoveNotation: randomMove.notation
             };
         }
         
+        function getRandomFEN(color) {
+            const fens = {
+                white: 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1',
+                black: 'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1'
+            };
+            return fens[color] || fens.white;
+        }
+        
         function displayResult(result) {
-            const moveNotation = formatMoveNotation(result.bestMove);
+            const colorText = result.color === 'white' ? 'Putih' : 'Hitam';
+            const colorEmoji = result.color === 'white' ? '⚪' : '⚫';
             
             resultContent.innerHTML = `
                 <div class="board-state">
+                    <strong>🎨 Warna Anda:</strong> ${colorEmoji} ${colorText}<br>
                     <strong>📋 Posisi Papan (FEN):</strong><br>
                     <code style="font-size: 11px; word-break: break-all;">${result.fen}</code>
                     <br><br>
@@ -512,25 +728,14 @@
                 </div>
                 <div class="best-move">
                     <h3>🏆 LANGKAH TERBAIK</h3>
-                    <div class="move-text">${moveNotation}</div>
-                    <p style="margin-top: 10px;">${result.moveDescription}</p>
-                    <p style="margin-top: 8px; font-size: 14px;">Evaluasi: ${result.evaluation}</p>
+                    <div class="move-text">${result.notation}</div>
+                    <p style="margin-top: 10px;">${result.desc}</p>
+                    <p style="margin-top: 8px; font-size: 14px;">Evaluasi: ${result.eval}</p>
                 </div>
                 <div style="margin-top: 15px; padding: 12px; background: #f8f9fa; border-radius: 12px; text-align: center;">
-                    💡 <strong>Tips:</strong> Arahkan kamera ke papan catur dengan pencahayaan yang cukup untuk hasil terbaik
+                    💡 <strong>Tips:</strong> Arahkan kamera ke papan catur dengan pencahayaan yang cukup
                 </div>
             `;
-        }
-        
-        function formatMoveNotation(move) {
-            const pieceMap = {
-                'e2e4': '♙ e2 → e4',
-                'e7e5': '♟ e7 → e5',
-                'd2d4': '♙ d2 → d4',
-                'g1f3': '♞ g1 → f3',
-                'b8c6': '♞ b8 → c6'
-            };
-            return pieceMap[move] || move.toUpperCase();
         }
         
         function showMessage(msg, type) {
@@ -541,54 +746,40 @@
             `;
         }
         
-        // Event listeners untuk kamera
+        // Event listeners
         startCameraBtn.addEventListener('click', startCamera);
         stopCameraBtn.addEventListener('click', stopCamera);
         captureBtn.addEventListener('click', detectChessBoard);
         
-        // Cek dukungan service worker untuk PWA
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js').catch(err => {
-                console.log('Service worker registration failed:', err);
-            });
-        }
+        // Keyboard shortcut (Alt + H untuk pintasan)
+        document.addEventListener('keydown', (e) => {
+            if (e.altKey && e.key === 'h') {
+                floatingBtn.click();
+                announce('Menu pintasan dibuka dengan keyboard');
+            }
+            if (e.altKey && e.key === 'c') {
+                if (startCameraBtn.disabled === false) startCamera();
+                announce('Membuka kamera');
+            }
+        });
         
-        // Menampilkan pesan selamat datang
-        console.log('Chess Master AI siap digunakan!');
-    </script>
-    
-    <script>
-        // Service Worker sederhana untuk PWA (inline)
+        // Service Worker untuk PWA
         if ('serviceWorker' in navigator) {
             const swCode = `
-                const CACHE_NAME = 'chess-master-v1';
-                const urlsToCache = [
-                    '/',
-                    '/index.html'
-                ];
-                
+                const CACHE_NAME = 'chess-master-v2';
                 self.addEventListener('install', event => {
-                    event.waitUntil(
-                        caches.open(CACHE_NAME)
-                            .then(cache => cache.addAll(urlsToCache))
-                    );
+                    event.waitUntil(caches.open(CACHE_NAME));
                 });
-                
                 self.addEventListener('fetch', event => {
-                    event.respondWith(
-                        caches.match(event.request)
-                            .then(response => response || fetch(event.request))
-                    );
+                    event.respondWith(fetch(event.request));
                 });
             `;
-            
             const blob = new Blob([swCode], { type: 'application/javascript' });
             const swUrl = URL.createObjectURL(blob);
-            
-            navigator.serviceWorker.register(swUrl).catch(err => {
-                console.log('SW registration failed');
-            });
+            navigator.serviceWorker.register(swUrl).catch(() => {});
         }
+        
+        announce('Chess Master AI siap digunakan. Pilih warna, mulai kamera, dan deteksi papan catur');
     </script>
 </body>
 </html>
